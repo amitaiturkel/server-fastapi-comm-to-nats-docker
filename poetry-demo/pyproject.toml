@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "poetry-demo"
+version = "0.1.0"
+description = ""
+authors = ["amitaiturkel <amitai.turkel@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pre-commit = "^3.4.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
