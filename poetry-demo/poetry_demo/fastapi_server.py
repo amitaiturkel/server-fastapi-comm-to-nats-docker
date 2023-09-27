@@ -33,7 +33,7 @@ parser = argparse.ArgumentParser(description="FastAPI app with NATS integration"
 parser.add_argument("--nats-port", type=int, required=True, help="NATS server port")
 
 @app.patch("/connect-nats")
-async def connect_nats(async def connect_nats(
+async def connect_nats(
     num: str = Header(None),
     operator: str = Header(None),
     user_id: str = Header(None),
