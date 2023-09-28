@@ -1,16 +1,15 @@
 import asyncio
 import json
+import os
 import argparse  # Import argparse for command-line argument parsing
 from nats.aio.client import Client as NATS
 from typing import Annotated, Dict
-
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.openapi.utils import get_openapi
 
 app = FastAPI()
 
-# Global variable to store the NATS port
-nats_port = None
+
 
 def custom_openapi():
     if app.openapi_schema:
@@ -28,9 +27,12 @@ def custom_openapi():
 
 app.openapi = custom_openapi
 
+# Default NATS port value
+DEFAULT_NATS_PORT = 4222
+
 # Add a command-line argument for NATS port
 parser = argparse.ArgumentParser(description="FastAPI app with NATS integration")
-parser.add_argument("--nats-port", type=int, required=True, help="NATS server port")
+parser.add_argument("--nats-port", type=int, default=DEFAULT_NATS_PORT, help="NATS server port")
 
 @app.patch("/connect-nats")
 async def connect_nats(
@@ -39,7 +41,7 @@ async def connect_nats(
     user_id: str = Header(None),
 ):
     global nats_port  # Access the global variable
-    await nc.connect(f"nats://localhost:{nats_port}")
+    await nc.connect(f"nats://{nats_server_address}:{nats_port}")  # Updated connection to use environment variable
     subject = "calc"
     request_data = {
         "num": num,
@@ -58,8 +60,12 @@ async def connect_nats(
 if __name__ == "__main__":
     import uvicorn
     nc = NATS()
-    
+
+    # Read the NATS server address from the environment variable
+    nats_server_address = os.environ.get("NATS_SERVER_ADDRESS", "localhost")
+
     # Parse command-line arguments and set the NATS port
     args = parser.parse_args()
     nats_port = args.nats_port  # Set the global variable
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
